@@ -11,7 +11,7 @@ import (
 
 var baseURL = "https://rally1.rallydev.com/slm/webservice/v2.0"
 
-func (r *Rally) getRequest(path string, params url.Values, v interface{}) (*http.Response, error) {
+func (r *Client) getRequest(path string, params url.Values, v interface{}) (*http.Response, error) {
 	theURL := fmt.Sprintf("%s/%s", baseURL, path)
 	if params != nil {
 		theURL += "?" + params.Encode()

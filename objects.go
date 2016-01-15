@@ -13,11 +13,13 @@ type PersistableObject struct {
 
 type DomainObject struct {
 	Subscription
+
+	RefURL string `json:"_ref"`
 }
 
 type WorkspaceDomainObject struct {
 	DomainObject
-	Workspace
+	Workspace *Workspace
 }
 
 type Workspace struct {
@@ -145,6 +147,15 @@ type Iteration struct {
 
 type Artifact struct {
 	WorkspaceDomainObject
+	Description    string
+	DisplayColor   string
+	Expedite       bool
+	FormattedID    string
+	LastUpdateDate *time.Time
+	Name           string
+	Notes          string
+	Ready          bool
+	Tags           *Ref
 }
 
 type PortfolioItem struct {
@@ -157,6 +168,7 @@ type PortfolioItemFeature struct {
 }
 
 type Defect struct {
+	SchedulableArtifact
 }
 
 type Blocker struct {
@@ -168,6 +180,7 @@ type Requirement struct {
 }
 
 type SchedulableArtifact struct {
+	Artifact
 }
 
 type Attachment struct {
