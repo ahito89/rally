@@ -22,7 +22,11 @@ func (r *Client) getRequest(path string, params url.Values, v interface{}) (*htt
 		return nil, err
 	}
 
-	req.Header.Add("ZSESSIONID", r.apikey)
+	if r.apikey != "" {
+	    req.Header.Add("ZSESSIONID", r.apikey)
+    } else {        
+        req.SetBasicAuth(r.username, r.password)     
+    }
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -36,9 +40,9 @@ func (r *Client) getRequest(path string, params url.Values, v interface{}) (*htt
 	resp.Body.Close()
 
 	if Debug {
-		//fmt.Println("Status code", resp.Status)
-		//fmt.Println("Headers", resp.Header)
-		//fmt.Printf("Debug content: \n%s\n\n", string(cnt))
+		fmt.Println("Status code", resp.Status)
+		fmt.Println("Headers", resp.Header)
+		fmt.Printf("Debug content: \n%s\n\n", string(cnt))
 	}
 
 	var operationResult struct {
@@ -53,8 +57,8 @@ func (r *Client) getRequest(path string, params url.Values, v interface{}) (*htt
 	}
 
 	if Debug {
-		fmt.Println("Content to /tmp/mama.json")
-		ioutil.WriteFile("/tmp/mama.json", cnt, 0644)
+		fmt.Println("Content to queryContent.json")
+		ioutil.WriteFile("queryContent.json", cnt, 0644)
 	}
 
 	err = json.Unmarshal(cnt, v)

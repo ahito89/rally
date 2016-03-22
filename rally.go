@@ -9,11 +9,15 @@ var Debug = false
 
 type Client struct {
 	apikey string
+    username string
+    password string
 }
 
-func New(apikey string) *Client {
+func New(apikey string, username string, password string) *Client {
 	return &Client{
 		apikey: apikey,
+        username: username,
+        password: password,
 	}
 }
 
