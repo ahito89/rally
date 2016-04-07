@@ -2,27 +2,30 @@ package rally
 
 import "time"
 
-// https://github.com/RallyTools/RallyRestToolkitForPython/blob/master/pyral/entity.py
-
+// PersistableObject definition 
 type PersistableObject struct {
 	CreationDate *time.Time
 	ObjectID     string
 	ObjectUUID   string
-	VersionId    string
+	VersionID    string
 }
 
+// DomainObject definition
 type DomainObject struct {
 	Subscription
 
 	RefURL string `json:"_ref"`
 }
 
+// WorkspaceDomainObject definition
 type WorkspaceDomainObject struct {
 	DomainObject
 	Workspace *Workspace
 }
 
+// Workspace definition
 type Workspace struct {
+    DomainObject
 	Children    []Project
 	Description string
 	Name        string
@@ -36,6 +39,7 @@ type Workspace struct {
 	// and more...
 }
 
+// User definition
 type User struct {
 	*DomainObject
 	CostCenter string
@@ -70,11 +74,20 @@ type User struct {
 	WorkspacePermission string
 }
 
+// Project definition 
 type Project struct {
+    WorkspaceDomainObject
+    
+    Description string
+    Name string
+    Notes string
+    SchemaVersion string
+    State string
 }
 
+// Subscription definition
 type Subscription struct {
-	ApiKeysEnabled          bool
+	APIKeysEnabled          bool
 	EmailEnabled            bool
 	ExpirationDate          *time.Time
 	MaximumCustomUserFields int
@@ -87,6 +100,7 @@ type Subscription struct {
 	// and more
 }
 
+// Ref definition
 type Ref struct {
 	Count         int
 	Ref           string `json:"_ref"`
@@ -95,6 +109,7 @@ type Ref struct {
 	RefObjectUUID string `json:"_refObjectUUID"`
 }
 
+// HierarchicalRequirement definition
 type HierarchicalRequirement struct {
 	Requirement
 	AcceptedDate  *time.Time
@@ -132,19 +147,64 @@ type HierarchicalRequirement struct {
 	TestCaseStatus      string
 }
 
+// TestCase definition
 type TestCase struct {
+    Artifact
+    DefectStatus string
+    DragAndDropRank string
+    LastBuild string
+    LastRun string
+    LastVerdict string
+    Method string
+    Objective string
+    Package string
+    PostConditions string
+    PreConditions string
+    Priority string
+    Recycled bool
+    Risk string
+    Type string
+    ValidationExpectedResult string
+    ValidationInput string
 }
 
+// Task definition
 type Task struct {
+    Artifact
+    
+    Actuals float64
+    Blocked bool
+    BlockedReason string
+    DragAndDropRank string
+    Estimate float64
+    Recycled bool
+    State string
+    TaskIndex int
+    TimeSpent float64
+    ToDo float64
 }
 
+// Release definition
 type Release struct {
 }
 
+// Iteration definition
 type Iteration struct {
 	WorkspaceDomainObject
+    EndDate *time.Time
+    Name string
+    Notes string
+    PlanEstimate float64
+    PlannedVelocity float64
+    StartDate *time.Time
+    State string
+    TaskActualTotal float64
+    TaskEstimateTotal float64
+    TaskRemainingTotal float64
+    Theme string
 }
 
+// Artifact definition
 type Artifact struct {
 	WorkspaceDomainObject
 	Description    string
@@ -158,153 +218,61 @@ type Artifact struct {
 	Tags           *Ref
 }
 
+// PortfolioItem definition
 type PortfolioItem struct {
 	Artifact
 }
 
+// PortfolioItemFeature definition
 type PortfolioItemFeature struct {
 	PortfolioItem
 	UserStories *Ref
 }
 
+// Defect definition
 type Defect struct {
 	SchedulableArtifact
 }
 
+// Blocker definition
 type Blocker struct {
 }
 
+// Requirement definition
 type Requirement struct {
 	SchedulableArtifact
 	Attachments *Ref
 }
 
+// SchedulableArtifact definition
 type SchedulableArtifact struct {
 	Artifact
 }
 
+// Attachment definition
 type Attachment struct {
+    WorkspaceDomainObject
+    
+    ContentType string
+    Description string
+    Name string
+    Size int
 }
 
-// class Workspace       (DomainObject): pass
-// class Blocker         (DomainObject): pass
-// class UserPermission  (DomainObject): pass
-// class WorkspacePermission   (UserPermission): pass
-// class ProjectPermission     (UserPermission): pass
+// TestCaseResult definition
+type TestCaseResult struct {
+    WorkspaceDomainObject
+    Build string
+    Date *time.Time
+    Duration float64
+    Notes string
+    Verdict string
+}
 
-// class WorkspaceDomainObject(DomainObject):
-//     """
-//         This is an Abstract Base class, with a convenience method (details) that
-//         formats the attrbutes and corresponding values into an easily viewable
-//         mulitiline string representation.
-//     """
-//     COMMON_ATTRIBUTES = ['_type',
-//                          'oid', 'ref', 'ObjectID', '_ref',
-//                          '_CreatedAt', '_hydrated',
-//                          'Name', 'Subscription', 'Workspace',
-//                          'FormattedID'
-//                         ]
-// class WorkspaceConfiguration(WorkspaceDomainObject): pass
-// class Type                  (WorkspaceDomainObject): pass
-// class Program               (WorkspaceDomainObject): pass
-// class Project               (WorkspaceDomainObject): pass
-// class Release               (WorkspaceDomainObject): pass
-// class Iteration             (WorkspaceDomainObject): pass  # query capable only
-// class ArtifactNotification  (WorkspaceDomainObject): pass  # query capable only
-// class AttributeDefinition   (WorkspaceDomainObject): pass  # query capable only
-// class TypeDefinition        (WorkspaceDomainObject): pass  # query capable only
-// class Attachment            (WorkspaceDomainObject): pass
-// class AttachmentContent     (WorkspaceDomainObject): pass
-// class Build                 (WorkspaceDomainObject): pass  # query capable only
-// class BuildDefinition       (WorkspaceDomainObject): pass  # query capable only
-// class BuildMetric           (WorkspaceDomainObject): pass  # query capable only
-// class BuildMetricDefinition (WorkspaceDomainObject): pass  # query capable only
-// class Change                (WorkspaceDomainObject): pass
-// class Changeset             (WorkspaceDomainObject): pass
-// class ConversationPost      (WorkspaceDomainObject): pass  # query capable only
-// class Milestone             (WorkspaceDomainObject): pass
-// class Preference            (WorkspaceDomainObject): pass
-// class PreliminaryEstimate   (WorkspaceDomainObject): pass
-// class SCMRepository         (WorkspaceDomainObject): pass
-// class State                 (WorkspaceDomainObject): pass
-// class TestCaseStep          (WorkspaceDomainObject): pass
-// class TestCaseResult        (WorkspaceDomainObject): pass
-// class TestFolder            (WorkspaceDomainObject): pass
-// class Tag                   (WorkspaceDomainObject): pass
-// class TimeEntryItem         (WorkspaceDomainObject): pass
-// class TimeEntryValue        (WorkspaceDomainObject): pass
-// class UserIterationCapacity (WorkspaceDomainObject): pass
-// class RecycleBinEntry       (WorkspaceDomainObject): pass
-// class RevisionHistory       (WorkspaceDomainObject): pass
-
-// class Revision              (WorkspaceDomainObject):
-//     INFO_ATTRS = ['RevisionNumber', 'Description', 'CreationDate', 'User']
-
-// classFor = { 'Persistable'             : Persistable,
-//              'DomainObject'            : DomainObject,
-//              'WorkspaceDomainObject'   : WorkspaceDomainObject,
-//              'Subscription'            : Subscription,
-//              'User'                    : User,
-//              'UserProfile'             : UserProfile,
-//              'UserPermission'          : UserPermission,
-//              'Workspace'               : Workspace,
-//              'WorkspaceConfiguration'  : WorkspaceConfiguration,
-//              'WorkspacePermission'     : WorkspacePermission,
-//              'Type'                    : Type,
-//              'TypeDefinition'          : TypeDefinition,
-//              'AttributeDefinition'     : AttributeDefinition,
-//              'Program'                 : Program,
-//              'Project'                 : Project,
-//              'ProjectPermission'       : ProjectPermission,
-//              'Artifact'                : Artifact,
-//              'ArtifactNotification'    : ArtifactNotification,
-//              'Release'                 : Release,
-//              'Iteration'               : Iteration,
-//              'Requirement'             : Requirement,
-//              'HierarchicalRequirement' : HierarchicalRequirement,
-//              'UserStory'               : UserStory,
-//              'Story'                   : Story,
-//              'Task'                    : Task,
-//              'Tag'                     : Tag,
-//              'Preference'              : Preference,
-//              'SCMRepository'           : SCMRepository,
-//              'RevisionHistory'         : RevisionHistory,
-//              'Revision'                : Revision,
-//              'Attachment'              : Attachment,
-//              'AttachmentContent'       : AttachmentContent,
-//              'TestCase'                : TestCase,
-//              'TestCaseStep'            : TestCaseStep,
-//              'TestCaseResult'          : TestCaseResult,
-//              'TestSet'                 : TestSet,
-//              'TestFolder'              : TestFolder,
-//              'TimeEntryItem'           : TimeEntryItem,
-//              'TimeEntryValue'          : TimeEntryValue,
-//              'Build'                   : Build,
-//              'BuildDefinition'         : BuildDefinition,
-//              'BuildMetric'             : BuildMetric,
-//              'BuildMetricDefinition'   : BuildMetricDefinition,
-//              'Defect'                  : Defect,
-//              'DefectSuite'             : DefectSuite,
-//              'Change'                  : Change,
-//              'Changeset'               : Changeset,
-//              'PortfolioItem'           : PortfolioItem,
-//              'PortfolioItem_Strategy'  : PortfolioItem_Strategy,
-//              'PortfolioItem_Initiative': PortfolioItem_Initiative,
-//              'PortfolioItem_Theme'     : PortfolioItem_Theme,
-//              'PortfolioItem_Feature'   : PortfolioItem_Feature,
-//              'State'                   : State,
-//              'PreliminaryEstimate'     : PreliminaryEstimate,
-//              'WebLinkDefinition'       : WebLinkDefinition,
-//              'Milestone'               : Milestone,
-//              'ConversationPost'        : ConversationPost,
-//              'Blocker'                 : Blocker,
-//              'AllowedAttributeValue'   : AllowedAttributeValue,
-//              'AllowedQueryOperator'    : AllowedQueryOperator,
-//              'CustomField'             : CustomField,
-//              'UserIterationCapacity'   : UserIterationCapacity,
-//              'CumulativeFlowData'      : CumulativeFlowData,
-//              'ReleaseCumulativeFlowData'   : ReleaseCumulativeFlowData,
-//              'IterationCumulativeFlowData' : IterationCumulativeFlowData,
-//              'RecycleBinEntry'         : RecycleBinEntry,
-//              'SearchObject'            : SearchObject,
-//            }
+// TestCaseStep definition
+type TestCaseStep struct {
+    WorkspaceDomainObject
+    ExpectedResult string
+    Input string
+    StepIndex int
+}
