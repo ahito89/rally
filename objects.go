@@ -5,43 +5,45 @@ import "time"
 // PersistableObject definition 
 type PersistableObject struct {
 	CreationDate *time.Time
-	ObjectID     string
+	ObjectID     int64
 	ObjectUUID   string
 	VersionID    string
 }
 
 // DomainObject definition
 type DomainObject struct {
+    PersistableObject
+    
 	Subscription
-
 	RefURL string `json:"_ref"`
 }
 
 // WorkspaceDomainObject definition
 type WorkspaceDomainObject struct {
 	DomainObject
+    
 	Workspace *Workspace
 }
 
 // Workspace definition
 type Workspace struct {
     DomainObject
+    
 	Children    []Project
 	Description string
 	Name        string
 	Notes       string
 	Owner       User
-	Projects    []Project
-	//RevisionHistory
+	Projects    []Project	
 	SchemaVersion string
 	State         string
-	Style         string
-	// and more...
+	Style         string	
 }
 
 // User definition
 type User struct {
 	*DomainObject
+    
 	CostCenter string
 	Department string
 	Disabled   bool
@@ -63,24 +65,22 @@ type User struct {
 	OnpremLdapUsername     string
 	Phone                  string
 	Planner                bool
-	//RevisionHistory
 	Role                   string
 	SubscriptionAdmin      bool
 	SubscriptionID         int
 	SubscriptionPermission string
-	//TeamMemberships
-	//UserPermissions
-	//UserProfile
 	WorkspacePermission string
 }
 
 // Project definition 
 type Project struct {
-    WorkspaceDomainObject
+    DomainObject
     
     Description string
+    Iterations []Iteration
     Name string
     Notes string
+    Owner User    
     SchemaVersion string
     State string
 }
@@ -112,16 +112,12 @@ type Ref struct {
 // HierarchicalRequirement definition
 type HierarchicalRequirement struct {
 	Requirement
+    
 	AcceptedDate  *time.Time
 	Blocked       bool
 	BlockedReason string
 	Blocker       *Blocker
 	CreationDate  *time.Time
-	// All the C_ fields seem to be custom fields !! We'll add support for that later.
-	// C_AcceptanceCriteria string
-	// C_CVSSRating         float64
-	// C_CVSSVector         string
-	// C_CXDLink            string
 	Changesets          *Ref
 	Children            *Ref
 	Defects             *Ref
@@ -150,6 +146,7 @@ type HierarchicalRequirement struct {
 // TestCase definition
 type TestCase struct {
     Artifact
+    
     DefectStatus string
     DragAndDropRank string
     LastBuild string
@@ -191,6 +188,7 @@ type Release struct {
 // Iteration definition
 type Iteration struct {
 	WorkspaceDomainObject
+    
     EndDate *time.Time
     Name string
     Notes string
@@ -207,6 +205,7 @@ type Iteration struct {
 // Artifact definition
 type Artifact struct {
 	WorkspaceDomainObject
+    
 	Description    string
 	DisplayColor   string
 	Expedite       bool
@@ -226,6 +225,7 @@ type PortfolioItem struct {
 // PortfolioItemFeature definition
 type PortfolioItemFeature struct {
 	PortfolioItem
+    
 	UserStories *Ref
 }
 
@@ -241,6 +241,7 @@ type Blocker struct {
 // Requirement definition
 type Requirement struct {
 	SchedulableArtifact
+    
 	Attachments *Ref
 }
 
@@ -262,6 +263,7 @@ type Attachment struct {
 // TestCaseResult definition
 type TestCaseResult struct {
     WorkspaceDomainObject
+    
     Build string
     Date *time.Time
     Duration float64
@@ -272,6 +274,7 @@ type TestCaseResult struct {
 // TestCaseStep definition
 type TestCaseStep struct {
     WorkspaceDomainObject
+    
     ExpectedResult string
     Input string
     StepIndex int
