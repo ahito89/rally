@@ -39,7 +39,7 @@ func (r *Client) GetHierarchicalRequirement(objectID int64) (*HierarchicalRequir
 	return hr.HierarchicalRequirement, nil
 }
 
-// QueryHierarchicalRequirement get the hierarchicalrequirement
+// QueryHierarchicalRequirement query the hierarchicalrequirement
 func (r *Client) QueryHierarchicalRequirement(formattedID string) (*HierarchicalRequirement, error) {
 	params := make(url.Values)
 	params.Add("fetch", "true")
@@ -66,7 +66,7 @@ func (r *Client) QueryHierarchicalRequirement(formattedID string) (*Hierarchical
 	return &out.QueryResult.Results[0], nil
 }
 
-// QueryPortfolioItemFeature get the PortfolioItemFeature
+// QueryPortfolioItemFeature query the PortfolioItemFeature
 func (r *Client) QueryPortfolioItemFeature(formattedID string) (*PortfolioItemFeature, error) {
 	params := make(url.Values)
 	params.Add("fetch", "true")
@@ -93,7 +93,107 @@ func (r *Client) QueryPortfolioItemFeature(formattedID string) (*PortfolioItemFe
 	return &out.QueryResult.Results[0], nil
 }
 
-// QueryDefect get the Defect
+// QueryTestCase query the test case
+func (r *Client) QueryTestCase(formattedID string) (*TestCase, error) {
+    params := make(url.Values)
+    params.Add("fetch", "true")
+    params.Add("query", fmt.Sprintf("(FormattedID = \"%s\")", formattedID))
+    
+    var out struct {
+        QueryResult struct {
+            Results          []TestCase
+            TotalResultCount int
+        }
+    }
+    
+    _, err := r.getRequest("testcase", params, &out)
+    if err != nil {
+        return nil, err
+    }
+    
+    if total := out.QueryResult.TotalResultCount; total != 1 {
+        return nil, fmt.Errorf("not found, or found too many (%v)", total)
+    }
+    
+    return &out.QueryResult.Results[0], nil
+}
+
+// QueryTestCaseStep query the test case step
+func (r *Client) QueryTestCaseStep(testCase string, index int) (*TestCaseStep, error) {
+    params := make(url.Values)
+    params.Add("fetch", "true")
+    params.Add("query", fmt.Sprintf("((TestCase = \"%s\") AND (StepIndex = %d))", testCase, index))
+    
+    var out struct {
+        QueryResult struct {
+            Results          []TestCaseStep
+            TotalResultCount int
+        }
+    }
+    
+    _, err := r.getRequest("testcasestep", params, &out)
+    if err != nil {
+        return nil, err
+    }
+    
+    if total := out.QueryResult.TotalResultCount; total != 1 {
+        return nil, fmt.Errorf("not found, or found too many (%v)", total)
+    }
+    
+    return &out.QueryResult.Results[0], nil
+}
+
+// QueryIteration query the iteration
+func (r *Client) QueryIteration(formattedID string) (*Iteration, error) {
+    params := make(url.Values)
+    params.Add("fetch", "true")
+    params.Add("query", fmt.Sprintf("(Name = \"%s\")", formattedID))
+    
+    var out struct {
+        QueryResult struct {
+            Results          []Iteration
+            TotalResultCount int
+        }
+    }
+    
+    _, err := r.getRequest("iteration", params, &out)
+    if err != nil {
+        return nil, err
+    }
+    
+    if total := out.QueryResult.TotalResultCount; total != 1 {
+        return nil, fmt.Errorf("not found, or found too many (%v)", total)
+    }
+    
+    return &out.QueryResult.Results[0], nil
+}
+
+// QueryProject query the project
+func (r *Client) QueryProject(formattedID string) (*Project, error) {
+    params := make(url.Values)
+    params.Add("fetch", "true")
+    params.Add("query", fmt.Sprintf("(Name = \"%s\")", formattedID))
+    
+    var out struct {
+        QueryResult struct {
+            Results          []Project
+            TotalResultCount int
+        }
+    }
+    
+    _, err := r.getRequest("project", params, &out)
+    if err != nil {
+        return nil, err
+    }
+    
+    if total := out.QueryResult.TotalResultCount; total != 1 {
+        return nil, fmt.Errorf("not found, or found too many (%v)", total)
+    }
+    
+    return &out.QueryResult.Results[0], nil
+}
+
+// QueryDefect query the Defect
 func (r *Client) QueryDefect(formattedID string) (*Defect, error) {
 	params := make(url.Values)
 	params.Add("fetch", "true")

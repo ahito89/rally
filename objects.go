@@ -29,12 +29,12 @@ type WorkspaceDomainObject struct {
 type Workspace struct {
     DomainObject
     
-	Children    []Project
+	Children    *Ref
 	Description string
 	Name        string
 	Notes       string
 	Owner       User
-	Projects    []Project	
+	Projects    *Ref	
 	SchemaVersion string
 	State         string
 	Style         string	
@@ -77,7 +77,7 @@ type Project struct {
     DomainObject
     
     Description string
-    Iterations []Iteration
+    Iterations *Ref
     Name string
     Notes string
     Owner User    
@@ -161,6 +161,9 @@ type TestCase struct {
     Recycled bool
     Risk string
     Type string
+    Steps *Ref
+    TestFolder *Ref
+    TestSet *Ref
     ValidationExpectedResult string
     ValidationInput string
 }
@@ -278,4 +281,33 @@ type TestCaseStep struct {
     ExpectedResult string
     Input string
     StepIndex int
+    TestCase *Ref
+}
+
+// TestFolder definition
+type TestFolder struct{
+    WorkspaceDomainObject
+    
+    Children *Ref
+    FormattedID string
+    Name string
+    Parent *Ref
+    Project *Ref
+    TestCases *Ref
+}
+
+// TestSet definition
+type TestSet struct {
+    SchedulableArtifact
+    
+    Blocked bool
+    BlockedReason string
+    Iteration *Ref
+    LastBuild string
+    LastRun *time.Time
+    PassingTestCaseCount int64
+    PlanEstimate float64
+    Release *Ref
+    TestCaseCount int64
+    TestCases *Ref   
 }
