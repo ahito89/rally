@@ -144,10 +144,14 @@ func (r *Client) QueryTestCaseStep(testCase string, index int) (*TestCaseStep, e
 }
 
 // QueryIteration query the iteration
-func (r *Client) QueryIteration(formattedID string) (*Iteration, error) {
+func (r *Client) QueryIteration(formattedID string) (*[]Iteration, error) {
     params := make(url.Values)
     params.Add("fetch", "true")
-    params.Add("query", fmt.Sprintf("(Name = \"%s\")", formattedID))
+    if formattedID != "" {
+    	params.Add("query", fmt.Sprintf("(Name = \"%s\")", formattedID))
+	} else {
+		params.Add("query","")
+	}
     
     var out struct {
         QueryResult struct {
@@ -161,18 +165,22 @@ func (r *Client) QueryIteration(formattedID string) (*Iteration, error) {
         return nil, err
     }
     
-    if total := out.QueryResult.TotalResultCount; total != 1 {
+ /*   if total := out.QueryResult.TotalResultCount; total != 1 {
         return nil, fmt.Errorf("not found, or found too many (%v)", total)
-    }
+    }*/
     
-    return &out.QueryResult.Results[0], nil
+    return &out.QueryResult.Results, nil
 }
 
-// QueryProject query the project
-func (r *Client) QueryProject(formattedID string) (*Project, error) {
+// QueryProject query for project based on project name
+func (r *Client) QueryProject(formattedID string) (*[]Project, error) {
     params := make(url.Values)
     params.Add("fetch", "true")
-    params.Add("query", fmt.Sprintf("(Name = \"%s\")", formattedID))
+	if formattedID != "" {
+    	params.Add("query", fmt.Sprintf("(Name = \"%s\")", formattedID))
+	} else {
+		params.Add("query","")
+	}
     
     var out struct {
         QueryResult struct {
@@ -185,12 +193,12 @@ func (r *Client) QueryProject(formattedID string) (*Project, error) {
     if err != nil {
         return nil, err
     }
-    
+    /*
     if total := out.QueryResult.TotalResultCount; total != 1 {
         return nil, fmt.Errorf("not found, or found too many (%v)", total)
-    }
+    }*/
     
-    return &out.QueryResult.Results[0], nil
+    return &out.QueryResult.Results, nil
 }
 
 // QueryDefect query the Defect
