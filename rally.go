@@ -3,6 +3,7 @@ package rally
 import (
 	"fmt"
 	"net/url"
+	"strconv"
 )
 
 // Debug mode prints messages
@@ -40,10 +41,18 @@ func (r *Client) GetHierarchicalRequirement(objectID int64) (*HierarchicalRequir
 }
 
 // QueryHierarchicalRequirement query the hierarchicalrequirement
-func (r *Client) QueryHierarchicalRequirement(formattedID string) (*HierarchicalRequirement, error) {
+func (r *Client) QueryHierarchicalRequirement(formattedID string, startIndex int) (*[]HierarchicalRequirement, int, error) {
+	if startIndex < 1 {
+		startIndex = 1
+	}
 	params := make(url.Values)
 	params.Add("fetch", "true")
-	params.Add("query", fmt.Sprintf("(FormattedID = %s)", formattedID))
+	if formattedID != "" {		
+		params.Add("query", fmt.Sprintf("(FormattedID = %s)", formattedID))
+	} else {
+		params.Add("query", "")
+	}
+	params.Add("start", strconv.Itoa(startIndex))
 
 	var out struct {
 		QueryResult struct {
@@ -54,20 +63,20 @@ func (r *Client) QueryHierarchicalRequirement(formattedID string) (*Hierarchical
 
 	_, err := r.getRequest("hierarchicalrequirement", params, &out)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	if total := out.QueryResult.TotalResultCount; total != 1 {
+	/*if total := out.QueryResult.TotalResultCount; total != 1 {
 		return nil, fmt.Errorf("not found, or found too many (%v)", total)
-	}
+	}*/
 
 	//jsonOut, _ := json.MarshalIndent(out, "", "  ")
 	//os.Stdout.Write(jsonOut)
-	return &out.QueryResult.Results[0], nil
+	return &out.QueryResult.Results, out.QueryResult.TotalResultCount, nil
 }
 
 // QueryPortfolioItemFeature query the PortfolioItemFeature
-func (r *Client) QueryPortfolioItemFeature(formattedID string) (*PortfolioItemFeature, error) {
+func (r *Client) QueryPortfolioItemFeature(formattedID string) (*PortfolioItemFeature, int, error) {
 	params := make(url.Values)
 	params.Add("fetch", "true")
 	params.Add("query", fmt.Sprintf("(FormattedID = %s)", formattedID))
@@ -81,23 +90,31 @@ func (r *Client) QueryPortfolioItemFeature(formattedID string) (*PortfolioItemFe
 
 	_, err := r.getRequest("portfolioitem/feature", params, &out)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	if total := out.QueryResult.TotalResultCount; total != 1 {
-		return nil, fmt.Errorf("not found, or found too many (%v)", total)
+		return nil, out.QueryResult.TotalResultCount, fmt.Errorf("not found, or found too many (%v)", total)
 	}
 
 	//jsonOut, _ := json.MarshalIndent(out, "", "  ")
 	//os.Stdout.Write(jsonOut)
-	return &out.QueryResult.Results[0], nil
+	return &out.QueryResult.Results[0], out.QueryResult.TotalResultCount, nil
 }
 
 // QueryTestCase query the test case
-func (r *Client) QueryTestCase(formattedID string) (*TestCase, error) {
+func (r *Client) QueryTestCase(formattedID string, startIndex int) (*[]TestCase, int, error) {
+	if startIndex < 1 {
+		startIndex = 1
+	}
     params := make(url.Values)
     params.Add("fetch", "true")
-    params.Add("query", fmt.Sprintf("(FormattedID = \"%s\")", formattedID))
+	if formattedID != "" { 
+    	params.Add("query", fmt.Sprintf("(FormattedID = \"%s\")", formattedID))
+	} else {
+		params.Add("query", "")
+	}
+	params.Add("start", strconv.Itoa(startIndex))
     
     var out struct {
         QueryResult struct {
@@ -108,22 +125,27 @@ func (r *Client) QueryTestCase(formattedID string) (*TestCase, error) {
     
     _, err := r.getRequest("testcase", params, &out)
     if err != nil {
-        return nil, err
+        return nil, 0, err
     }
     
-    if total := out.QueryResult.TotalResultCount; total != 1 {
+ /*   if total := out.QueryResult.TotalResultCount; total != 1 {
         return nil, fmt.Errorf("not found, or found too many (%v)", total)
-    }
+    }*/
     
-    return &out.QueryResult.Results[0], nil
+    return &out.QueryResult.Results, out.QueryResult.TotalResultCount, nil
 }
 
-// QueryTestCaseStep query the test case step
-func (r *Client) QueryTestCaseStep(testCase string, index int) (*TestCaseStep, error) {
+// QueryTestCaseSteps query the test case step
+func (r *Client) QueryTestCaseSteps(testCase string, startIndex int) (*[]TestCaseStep, int, error) {
+	if startIndex < 1 {
+		startIndex = 1
+	}
+	
     params := make(url.Values)
     params.Add("fetch", "true")
-    params.Add("query", fmt.Sprintf("((TestCase = \"%s\") AND (StepIndex = %d))", testCase, index))
-    
+    params.Add("query", fmt.Sprintf("(TestCase = \"%s\")", testCase))
+    params.Add("start", strconv.Itoa(startIndex))
+	
     var out struct {
         QueryResult struct {
             Results          []TestCaseStep
@@ -133,18 +155,21 @@ func (r *Client) QueryTestCaseStep(testCase string, index int) (*TestCaseStep, e
     
     _, err := r.getRequest("testcasestep", params, &out)
     if err != nil {
-        return nil, err
+        return nil, 0, err
     }
     
-    if total := out.QueryResult.TotalResultCount; total != 1 {
+ /*   if total := out.QueryResult.TotalResultCount; total != 1 {
         return nil, fmt.Errorf("not found, or found too many (%v)", total)
-    }
+    }*/
     
-    return &out.QueryResult.Results[0], nil
+    return &out.QueryResult.Results, out.QueryResult.TotalResultCount, nil
 }
 
 // QueryIteration query the iteration
-func (r *Client) QueryIteration(formattedID string) (*[]Iteration, error) {
+func (r *Client) QueryIteration(formattedID string, startIndex int) (*[]Iteration, int, error) {
+	if startIndex < 1 {
+		startIndex = 1
+	}
     params := make(url.Values)
     params.Add("fetch", "true")
     if formattedID != "" {
@@ -152,7 +177,7 @@ func (r *Client) QueryIteration(formattedID string) (*[]Iteration, error) {
 	} else {
 		params.Add("query","")
 	}
-    
+    params.Add("start", strconv.Itoa(startIndex))
     var out struct {
         QueryResult struct {
             Results          []Iteration
@@ -162,18 +187,21 @@ func (r *Client) QueryIteration(formattedID string) (*[]Iteration, error) {
     
     _, err := r.getRequest("iteration", params, &out)
     if err != nil {
-        return nil, err
+        return nil, 0, err
     }
     
  /*   if total := out.QueryResult.TotalResultCount; total != 1 {
         return nil, fmt.Errorf("not found, or found too many (%v)", total)
     }*/
     
-    return &out.QueryResult.Results, nil
+    return &out.QueryResult.Results, out.QueryResult.TotalResultCount, nil
 }
 
 // QueryProject query for project based on project name
-func (r *Client) QueryProject(formattedID string) (*[]Project, error) {
+func (r *Client) QueryProject(formattedID string, startIndex int) (*[]Project, int, error) {
+	if startIndex < 1 {
+		startIndex = 1
+	}
     params := make(url.Values)
     params.Add("fetch", "true")
 	if formattedID != "" {
@@ -181,7 +209,7 @@ func (r *Client) QueryProject(formattedID string) (*[]Project, error) {
 	} else {
 		params.Add("query","")
 	}
-    
+    params.Add("start",strconv.Itoa(startIndex))
     var out struct {
         QueryResult struct {
             Results          []Project
@@ -191,18 +219,18 @@ func (r *Client) QueryProject(formattedID string) (*[]Project, error) {
     
     _, err := r.getRequest("project", params, &out)
     if err != nil {
-        return nil, err
+        return nil, 0, err
     }
     /*
     if total := out.QueryResult.TotalResultCount; total != 1 {
         return nil, fmt.Errorf("not found, or found too many (%v)", total)
     }*/
     
-    return &out.QueryResult.Results, nil
+    return &out.QueryResult.Results, out.QueryResult.TotalResultCount, nil
 }
 
 // QueryDefect query the Defect
-func (r *Client) QueryDefect(formattedID string) (*Defect, error) {
+func (r *Client) QueryDefect(formattedID string) (*[]Defect, int, error) {
 	params := make(url.Values)
 	params.Add("fetch", "true")
 	params.Add("query", fmt.Sprintf("(FormattedID = %s)", formattedID))
@@ -216,12 +244,12 @@ func (r *Client) QueryDefect(formattedID string) (*Defect, error) {
 
 	_, err := r.getRequest("defect", params, &out)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	if total := out.QueryResult.TotalResultCount; total != 1 {
+	/*if total := out.QueryResult.TotalResultCount; total != 1 {
 		return nil, fmt.Errorf("not found, or found too many (%v)", total)
-	}
+	}*/
 
-	return &out.QueryResult.Results[0], nil
+	return &out.QueryResult.Results, out.QueryResult.TotalResultCount, nil
 }

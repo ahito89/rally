@@ -116,7 +116,7 @@ type HierarchicalRequirement struct {
 	AcceptedDate  *time.Time
 	Blocked       bool
 	BlockedReason string
-	Blocker       *Blocker
+	Blocker       *Ref
 	CreationDate  *time.Time
 	Changesets          *Ref
 	Children            *Ref
@@ -124,7 +124,7 @@ type HierarchicalRequirement struct {
 	DefectStatus        string // make special values ?
 	DirectChildrenCount int
 	DragAndDropRank     string
-	Feature             *PortfolioItemFeature
+	Feature             *Ref
 	HasParent           bool
 	InProgressDate      *time.Time
 	Iteration           *Ref
@@ -166,6 +166,7 @@ type TestCase struct {
     TestSet *Ref
     ValidationExpectedResult string
     ValidationInput string
+	WorkProduct *Ref
 }
 
 // Task definition
@@ -203,6 +204,7 @@ type Iteration struct {
     TaskEstimateTotal float64
     TaskRemainingTotal float64
     Theme string
+	Project *Ref
 }
 
 // Artifact definition
