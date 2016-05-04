@@ -143,7 +143,12 @@ func (r *Client) QueryTestCaseSteps(testCase string, startIndex int) (*[]TestCas
 	
     params := make(url.Values)
     params.Add("fetch", "true")
-    params.Add("query", fmt.Sprintf("(TestCase = \"%s\")", testCase))
+	if testCase != "" { 
+    	params.Add("query", fmt.Sprintf("(TestCase = \"%s\")", testCase))
+	} else {
+		params.Add("query", "")
+	}
+    
     params.Add("start", strconv.Itoa(startIndex))
 	
     var out struct {
