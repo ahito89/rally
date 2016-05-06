@@ -258,3 +258,35 @@ func (r *Client) QueryDefect(formattedID string) (*[]Defect, int, error) {
 
 	return &out.QueryResult.Results, out.QueryResult.TotalResultCount, nil
 }
+
+// QueryTestFolder query the test folder
+func (r *Client) QueryTestFolder(formattedID string, startIndex int) (*[]TestFolder, int, error) {
+	if startIndex < 1 {
+		startIndex = 1
+	}
+    params := make(url.Values)
+    params.Add("fetch", "true")
+    if formattedID != "" {
+    	params.Add("query", fmt.Sprintf("(Name = \"%s\")", formattedID))
+	} else {
+		params.Add("query","")
+	}
+    params.Add("start", strconv.Itoa(startIndex))
+    var out struct {
+        QueryResult struct {
+            Results          []TestFolder
+            TotalResultCount int
+        }
+    }
+    
+    _, err := r.getRequest("testfolder", params, &out)
+    if err != nil {
+        return nil, 0, err
+    }
+    
+ /*   if total := out.QueryResult.TotalResultCount; total != 1 {
+        return nil, fmt.Errorf("not found, or found too many (%v)", total)
+    }*/
+    
+    return &out.QueryResult.Results, out.QueryResult.TotalResultCount, nil
+}
